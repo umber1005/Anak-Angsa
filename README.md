@@ -1,107 +1,108 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-  <title>Petualangan Gigi Si Angsa</title>
+  <meta charset="UTF-8" />
+  <title>Game Menetaskan Telur Angsa</title>
   <style>
-    body { margin: 0; overflow: hidden; background-color: #cceeff; font-family: sans-serif; }
-    canvas { display: block; margin: 0 auto; background: #a3d9ff; }
-    #questionBox {
-      display: none;
-      position: absolute;
-      top: 30%;
-      left: 50%;
-      transform: translateX(-50%);
-      background: white;
-      padding: 20px;
-      border: 2px solid #333;
-      border-radius: 10px;
-      text-align: center;
+    body {
+      background: #c2f0f7;
+      font-family: "Comic Sans MS", cursive, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+      flex-direction: column;
     }
-    button { margin-top: 10px; }
+
+    h1 {
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    #game-container {
+      position: relative;
+      width: 500px;
+      height: 400px;
+      background: #f5f5dc;
+      border: 5px solid #888;
+      border-radius: 20px;
+      box-shadow: 4px 4px 10px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+
+    #goose {
+      position: absolute;
+      width: 200px;
+      bottom: 50px;
+      left: 30px;
+    }
+
+    #egg {
+      position: absolute;
+      width: 100px;
+      bottom: 40px;
+      left: 280px;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    #chick {
+      position: absolute;
+      width: 100px;
+      bottom: 40px;
+      left: 280px;
+      display: none;
+    }
+
+    #clicks {
+      margin-top: 10px;
+      font-size: 18px;
+    }
+
+    #message {
+      font-size: 20px;
+      color: green;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
-<canvas id="gameCanvas" width="800" height="400"></canvas>
-<div id="questionBox">
-  <p id="questionText">Apa yang harus Gigi lakukan?</p>
-  <button onclick="answer(true)">Mendengarkan nasihat</button>
-  <button onclick="answer(false)">Pergi sendiri saja</button>
-</div>
-<script>
-  const canvas = document.getElementById("gameCanvas");
-  const ctx = canvas.getContext("2d");
 
-  const gigi = { x: 50, y: 300, width: 40, height: 40, color: "white" };
-  const mud = { x: 300, y: 320, width: 80, height: 30, color: "brown" };
-  const home = { x: 750, y: 300, width: 40, height: 40, color: "yellow" };
+  <h1>Menetaskan Telur Angsa</h1>
+  <div id="game-container">
+    <img id="goose" src="https://cdn.pixabay.com/photo/2021/08/06/13/23/goose-6526860_1280.png" alt="Induk Angsa" />
+    <img id="egg" src="https://cdn.pixabay.com/photo/2016/03/31/20/11/easter-egg-1293512_1280.png" alt="Telur" />
+    <img id="chick" src="https://cdn.pixabay.com/photo/2021/04/12/08/47/chick-6169987_1280.png" alt="Anak Angsa" />
+  </div>
 
-  let gameOver = false;
-  let questionShown = false;
+  <div id="clicks">Tekan telur untuk menetaskan!</div>
+  <div id="message"></div>
 
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Gigi
-    ctx.fillStyle = gigi.color;
-    ctx.beginPath();
-    ctx.arc(gigi.x, gigi.y, 20, 0, Math.PI * 2);
-    ctx.fill();
+  <script>
+    const egg = document.getElementById("egg");
+    const chick = document.getElementById("chick");
+    const clicksText = document.getElementById("clicks");
+    const message = document.getElementById("message");
 
-    // Tanah
-    ctx.fillStyle = "#228B22";
-    ctx.fillRect(0, 340, canvas.width, 60);
+    let clicks = 0;
+    const maxClicks = 7;
 
-    // Lumpur
-    ctx.fillStyle = mud.color;
-    ctx.fillRect(mud.x, mud.y, mud.width, mud.height);
+    egg.addEventListener("click", () => {
+      clicks++;
+      egg.style.transform = "scale(1.05)";
+      setTimeout(() => egg.style.transform = "scale(1)", 100);
 
-    // Rumah
-    ctx.fillStyle = home.color;
-    ctx.fillRect(home.x, home.y, home.width, home.height);
-  }
-
-  function update() {
-    if (checkCollision(gigi, mud)) {
-      alert("Gigi terjatuh ke lumpur! Coba lagi ya.");
-      gigi.x = 50;
-    }
-
-    if (checkCollision(gigi, home) && !questionShown) {
-      showQuestion();
-      questionShown = true;
-    }
-  }
-
-  function checkCollision(a, b) {
-    return a.x < b.x + b.width &&
-           a.x + a.width > b.x &&
-           a.y < b.y + b.height &&
-           a.y + a.height > b.y;
-  }
-
-  function showQuestion() {
-    document.getElementById("questionBox").style.display = "block";
-  }
-
-  function answer(isCorrect) {
-    if (isCorrect) {
-      alert("Benar! Gigi harus mendengarkan nasihat.");
-      location.reload(); // Lanjut ke level berikutnya (bisa ganti jadi level2.html)
-    } else {
-      alert("Ups, salah. Yuk coba lagi!");
-      location.reload();
-    }
-  }
-
-  document.addEventListener("keydown", (e) => {
-    if (gameOver) return;
-    if (e.key === "ArrowRight") gigi.x += 10;
-    if (e.key === "ArrowLeft") gigi.x -= 10;
-    draw();
-    update();
-  });
-
-  draw();
-</script>
+      if (clicks < maxClicks) {
+        clicksText.textContent = `Mengetuk telur... (${clicks}/${maxClicks})`;
+      } else {
+        egg.style.display = "none";
+        chick.style.display = "block";
+        message.textContent = "Telur menetas! Lihat, anak angsa lahir!";
+        clicksText.textContent = "";
+      }
+    });
+  </script>
 </body>
 </html>
